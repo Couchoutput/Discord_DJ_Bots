@@ -1,0 +1,5 @@
+Couchoutput Bot
+
+Provide Announcements for uploaded YouTube videos and other content
+
+Provide a welcome direct message to new members

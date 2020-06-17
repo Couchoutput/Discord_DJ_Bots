@@ -1,0 +1,26 @@
+{
+  "name": "DJ_Sparky",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "Mike Brice: Couchoutput Studios",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/opus": "^0.3.2",
+    "discord.js": "^11.6.4",
+    "ffmpeg": "0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "spotify-web-api-js": "^1.4.0",
+    "xmlhttprequest": "^1.8.0",
+    "ytdl-core": "^2.1.7",
+    "ytsr": "^0.1.15"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}

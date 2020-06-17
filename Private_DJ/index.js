@@ -1,11 +1,11 @@
 const Discord = require("discord.js");
 
-const prefix = "?";
-const token = "NzIxMTM0MDQzNjUwOTgxOTAw.Xupmfg.XtQHMv8-GNJHYe-ZQJyjGG3ZezQ"
 const ytdl = require("ytdl-core");
 const ytsr = require("ytsr")
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var Spotify = require('spotify-web-api-js');
+
+const {prefix, token,} = require('./config.json')
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -57,7 +57,7 @@ client.once("ready", async () => {
   for (const admin of admins) {
     botData.admins.set(admin[1].user.username, admin[1].user)
   }
-  /*
+
   //console.log(botData.admins)
   var couchoutput = client.guilds.find(x => x.name === 'Couchoutput Studios').roles.find(x => x.name === "Couchoutput").members
   for (const couch of couchoutput) {
@@ -68,7 +68,7 @@ client.once("ready", async () => {
   for (const mod of moderators) {
     botData.moderators.set(mod[1].user.username, mod[1].user)
   }
-  */
+  
   commandFiles = await getFiles('./commands')
 
   for (const file of commandFiles) {

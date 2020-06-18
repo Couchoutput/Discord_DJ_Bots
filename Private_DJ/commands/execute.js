@@ -49,9 +49,32 @@ module.exports = {
         return updateMessage.execute(botData)
       }
 
+			// If YouTube Playlist, get the playlists songs and play them
+			if (args.startsWith("https://") && args.match(/playlist/g) != null && !args.match(/youtube/g) != null) {
 
+				const play = botData.songs.length
+	      const getPlaylistSongs = require('../util/getPlaylistSongs.js')
+	      await getPlaylistSongs.execute(botData, args, message.author, "YT_PLAYLIST")
 
-      if (args.startsWith("https://")) {
+				if (play == 0) {
+					try {
+						var connection = await botData.voiceChannel.join();
+						botData.connection = connection;
+						return playSong.execute(message, botData.songs[0], botData.requesters[0], botData);
+					} catch (err) {
+						console.log(err);
+						botData.currentReply = `[${message.author}] I failed to play that Song.`
+						return updateMessage.execute(botData)
+					}
+				}
+				else {
+          botData.currentQueue = await queueToString.execute(botData);
+ 				 	botData.currentReply = "";
+          return updateMessage.execute(botData)
+        }
+			}
+
+      else if (args.startsWith("https://") || args.startsWith("www.youtube.com") || args.startsWith("youtube.com")) {
         song = await getSongInfo.execute(args, "YT_URL")
       }
 
@@ -68,7 +91,7 @@ module.exports = {
          try {
            var connection = await botData.voiceChannel.join();
            botData.connection = connection;
-           playSong.execute(message, botData.songs[0], botData.requesters[0], botData);
+           return playSong.execute(message, botData.songs[0], botData.requesters[0], botData);
          } catch (err) {
            console.log(err);
 					 botData.currentReply = `[${message.author}] I failed to play that Song.`

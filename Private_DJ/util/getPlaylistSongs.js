@@ -13,6 +13,8 @@ module.exports = {
 			var res = await ytpl(args)
 			//console.log(res['items'])
 			for (const info of res['items']) {
+				//console.log(info != undefined)
+				//console.log(info != null && info.title != '[Deleted video]' && info.id != null)
 				if (info.title != '[Deleted video]') {
 					const song = {
 						title: info.title,
@@ -23,6 +25,7 @@ module.exports = {
 					botData.requesters.push(requester)
 				}
 			}
+			//console.log(botData.songs)
 		}
 	}
 }

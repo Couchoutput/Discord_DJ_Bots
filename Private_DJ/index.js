@@ -47,6 +47,8 @@ const botData = {
   currentReply: "",
   botName: null,
   react: 0,
+  page: 1,
+  pages: null,
   offset: 1
 };
 
@@ -134,17 +136,86 @@ client.on('messageReactionAdd', async (reaction, user) => {
   const updateMessage = require('./util/updateMessage.js')
   const queueToString = require('./util/queueToString.js')
   if (reaction.emoji.name === "next") {
+    // If the playlist offset is less than the last page, move next one page
+    if (botData.offset < botData.songs.length - ((botData.songs.length-1) % 10)) - 10
     botData.offset += 10
+    botData.page += 1
   }
   if (reaction.emoji.name === "back") {
-    botData.offset -= 10
+    // If the playlist offset is greater than the first page, move back one page
+    if (botData.offset > 10) {
+      botData.offset -= 10
+      botData.page -= 1
+    }
   }
   if (reaction.emoji.name === "forward") {
-    botData.offset = botData.songs.length - ((botData.songs.length-1) % 10)
-    console.log(botData.songs.length - ((botData.songs.length-1) % 10))
+    // IF the playlist offset is less than the last page, move to the last page
+    var dif = (botData.songs.length-1) % 10
+    if (dif > 0) {
+      if (botData.offset < botData.songs.length - dif) {
+        botData.offset = botData.songs.length - ((botData.songs.length-1) % 10)
+        botData.page = botData.pages
+      }
+    }
+    else {
+      if (botData.offset < botData.songs.length - 10) {
+        botData.offset = botData.songs.length - 10
+        botData.page = botData.pages
+      }
+    }
+
   }
   if (reaction.emoji.name === "backward") {
-    botData.offset = 1
+    // If the playlist offset is greater than the first page, move to the first page
+    if (botData.offset > 10) {
+      botData.offset = 1
+      botData.page = 1
+    }
+  }
+  botData.currentQueue = await queueToString.execute(botData)
+  updateMessage.execute(botData)
+})
+
+client.on('messageReactionRemove', async (reaction, user) => {
+  //console.log(user)
+  if (user.bot) return;
+  const updateMessage = require('./util/updateMessage.js')
+  const queueToString = require('./util/queueToString.js')
+  if (reaction.emoji.name === "next") {
+    // If the playlist offset is less than the last page, move next one page
+    if (botData.offset < botData.songs.length - ((botData.songs.length-1) % 10) - 10)
+      botData.offset += 10
+      botData.page += 1
+  }
+  if (reaction.emoji.name === "back") {
+    // If the playlist offset is greater than the first page, move back one page
+    if (botData.offset > 10) {
+      botData.offset -= 10
+      botData.page -= 1
+    }
+  }
+  if (reaction.emoji.name === "forward") {
+    // IF the playlist offset is less than the last page, move to the last page
+    var dif = (botData.songs.length-1) % 10
+    if (dif > 0) {
+      if (botData.offset < botData.songs.length - dif) {
+        botData.offset = botData.songs.length - ((botData.songs.length-1) % 10)
+        botData.page = botData.pages
+      }
+    }
+    else {
+      if (botData.offset < botData.songs.length - 10) {
+        botData.offset = botData.songs.length - 10
+        botData.page = botData.pages
+      }
+    }
+  }
+  if (reaction.emoji.name === "backward") {
+    // If the playlist offset is greater than the first page, move to the first page
+    if (botData.offset > 10) {
+      botData.offset = 1
+      botData.page = 1
+    }
   }
   botData.currentQueue = await queueToString.execute(botData)
   updateMessage.execute(botData)
@@ -170,19 +241,8 @@ client.on("message", async message => {
     }
   }
   if (message.content.startsWith(`${prefix}play`) || message.content.startsWith(`${prefix}Play`)) {
-    const args = message.content.substring(6);
-    if (args.startsWith("https://") && args.match(/playlist/g) != null && !args.match(/youtube/g) != null) {
-      const getPlaylistSongs = require('./util/getPlaylistSongs.js')
-      await getPlaylistSongs.execute(botData, args, message.author, "YT_PLAYLIST")
-
-      client.commands.get('executePlaylist').execute(client, message, botData, "YT_URL");
-
-      return message.delete()
-    }
-    else {
-      client.commands.get('execute').execute(client, message, botData);
-      return message.delete();
-    }
+    client.commands.get('execute').execute(client, message, botData);
+    return message.delete();
   } else if (message.content.startsWith(`${prefix}skip`) || message.content.startsWith(`${prefix}Skip`)) {
     client.commands.get('skip').execute(message, botData);
     return message.delete();

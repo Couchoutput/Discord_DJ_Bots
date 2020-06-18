@@ -15,13 +15,14 @@ module.exports = {
 	 const forward = botData.client.emojis.find(emoji => emoji.name === 'forward');
 	 const backward = botData.client.emojis.find(emoji => emoji.name === 'backward');
 
-	 if (botData.react == 3) {
-		 await msg.clearReactions().catch(error => console.error('Failed to clear reactions: ', error))
+	 if (botData.react == 1) {
+		 //await msg.clearReactions().catch(error => console.error('Failed to clear reactions: ', error))
 		 msg.react(backward)
 		 msg.react(back)
 		 msg.react(next)
 		 msg.react(forward)
 	 }
+	 /*
 	 else if (botData.react == 2) {
 		 await msg.clearReactions().catch(error => console.error('Failed to clear reactions: ', error))
 		 msg.react(next)
@@ -32,7 +33,7 @@ module.exports = {
 		 msg.react(backward)
 		 msg.react(back)
 
-	 } else {
+	 } */else {
 		 msg.clearReactions().catch(error => console.error('Failed to clear reactions: ', error))
 	 }
   }

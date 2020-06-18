@@ -16,6 +16,7 @@ module.exports = {
 			const createQueueMessage = await require('./createQueueMessage.js')
 			const createCommandMessage = await require('./createCommandMessage.js')
 			const createReplyMessage = await require('./createReplyMessage.js')
+			const updateMessage = await require('./updateMessage.js')
 
 		  await server.createChannel("sparky-controller", {type: 'text', parent: category}).catch(console.error);
 
@@ -25,6 +26,9 @@ module.exports = {
 			botData.queue = await createQueueMessage.execute(botData);
 			botData.command = await createCommandMessage.execute(botData)
 			botData.reply = await createReplyMessage.execute(botData)
+
+			updateMessage.execute(botData)
+			
 		} else {
 
 			const joinVoice = await require('./joinVoice.js')

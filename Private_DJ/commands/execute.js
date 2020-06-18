@@ -12,8 +12,9 @@ module.exports = {
 		const playSong = require('../util/playSong.js')
 		const queueToString = require('../util/queueToString.js')
 		const updateMessage = require('../util/updateMessage.js')
+		const getSongInfo = require('../util/getSongInfo.js')
 
-    const args = message.content.substring(6);
+		const args = message.content.substring(6);
 
 		// pass args through language filter
 
@@ -48,31 +49,16 @@ module.exports = {
         return updateMessage.execute(botData)
       }
 
+
+
       if (args.startsWith("https://")) {
-        const songInfo = await ytdl.getInfo(args);
-        song = {
-         title: songInfo.title,
-         url: songInfo.video_url,
-         duration: songInfo.length_seconds
-         };
+        song = await getSongInfo.execute(args, "YT_URL")
       }
 
       else {
-        const songInfo = await ytsr(args);
-
-        i = 0;
-        // Look for the first item that is labeled as a Video
-        while (songInfo["items"][i].type != 'video') {
-          i++;
-        }
-        //console.log(songInfo["items"][i])
-        song = {
-         title: songInfo["items"][i].title,
-         url: songInfo["items"][i].link,
-         duration: songInfo["items"][i].duration
-         };
+        song = await getSongInfo.execute(args, "Name")
       }
-       if (botData.songs.length == 0) {
+      if (botData.songs.length == 0) {
 
          //queue.set(message.guild.id, botData);
 

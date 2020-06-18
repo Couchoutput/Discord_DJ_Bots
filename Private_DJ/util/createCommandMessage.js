@@ -3,11 +3,11 @@ module.exports = {
 	description: 'Creates the DJ\'s Command Message',
 
 	async execute(botData) {
-		const couchoutputBot = botData.guild
+
     var msg = await botData.textChannel.send({embed: {
       color: 0xe9e949,
       title: `${botData.botName}'s Commands`,
-      description: `You must be in the ${botData.textChannel} text channel and "${botData.botName} Lounge" voice channel and have been granted Music Rights by ${botData.admins.get('Jani')} to run these commands `,
+      description: `You must be in the ${botData.textChannel} text channel and "${botData.botName} Lounge" voice channel and have been granted Music Rights by ${botData.admins.get('Couchoutput Bot')} to run these commands `,
       fields: [
         {
           name: `**${botData.prefix}play YouTube URL/Name of the song**`,
@@ -18,10 +18,8 @@ module.exports = {
           value: `Skips to another song in ${botData.botName}'s playlist. Default is the next song.\nExample: ${botData.prefix}skip or ${botData.prefix}skip 3`,
         },
 				{
-					name: `**${botData.prefix}playlist [back/next]**`,
-					value: `If ${botData.botName}'s playlist is larger than the view window, use back or next to shift through the playlist viewer.
-									Example: ${botData.prefix}playlist back | Moves backward in the playlist viewer.
-									Example: ${botData.prefix}playlist next | Moves forward in the playlist viewer.`,
+					name: `**${botData.prefix}shuffle [back/next]**`,
+					value: `Suffles ${botData.botName}'s playlist`,
 				},
         {
           name: `**${botData.prefix}stop**`,

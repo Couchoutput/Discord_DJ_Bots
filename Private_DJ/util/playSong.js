@@ -18,7 +18,7 @@ module.exports = {
     const dispatcher = botData.connection
 
     //dispatcher.setVolumeDecibels(60)
-    dispatcher.playStream(ytdl(song.url), { filter : 'audioonly'}).on("end", () => {
+    dispatcher.playStream(ytdl(song.url, {quality: 'highestaudio'}), { filter : 'audioonly'}).on("end", () => {
         botData.songs.shift();
         botData.requesters.shift();
 

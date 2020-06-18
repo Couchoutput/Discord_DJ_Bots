@@ -30,6 +30,7 @@ const botData = {
   couchoutputs: new Discord.Collection(),
   moderators: new Discord.Collection(),
   client: client,
+  guild: null,
   textChannel: null,
   voiceChannel: null,
   connection: null,
@@ -44,31 +45,40 @@ const botData = {
   currentSong: "No Songs to Play",
   currentQueue: "No Songs in Playlist",
   currentReply: "",
-  botName: null
+  botName: null,
+  react: 0,
+  offset: 1
 };
+
+const serverCheck = require('./util/serverCheck.js')
+
+client.on("channelDelete", async () => {
+  serverCheck.serverCheck(botData)
+});
 
 client.once("ready", async () => {
   // Gets the Bot's Name
   botData.botName = client.user.username
   console.log(`Logged in as ${client.user.tag}!`)
+  botData.guild = client.guilds.find(x => x.name === 'Couchoutput Studios')
 
-  var admins = client.guilds.find(x => x.name === 'Couchoutput Studios').roles.find(x => x.name === "Admins").members
+  var admins = botData.guild.roles.find(x => x.name === "Admins").members
 
   for (const admin of admins) {
     botData.admins.set(admin[1].user.username, admin[1].user)
   }
 
   //console.log(botData.admins)
-  var couchoutput = client.guilds.find(x => x.name === 'Couchoutput Studios').roles.find(x => x.name === "Couchoutput").members
+  var couchoutput = botData.guild.roles.find(x => x.name === "Couchoutput").members
   for (const couch of couchoutput) {
     botData.couchoutputs.set(couch[1].user.username, couch[1].user)
   }
 
-  var moderators = client.guilds.find(x => x.name === 'Couchoutput Studios').roles.find(x => x.name === "Moderators").members
+  var moderators = botData.guild.roles.find(x => x.name === "Moderators").members
   for (const mod of moderators) {
     botData.moderators.set(mod[1].user.username, mod[1].user)
   }
-  
+
   commandFiles = await getFiles('./commands')
 
   for (const file of commandFiles) {
@@ -83,28 +93,26 @@ client.once("ready", async () => {
    const createReplyMessage = await require('./util/createReplyMessage.js')
    const joinVoice = await require('./util/joinVoice.js')
 
+
   // Gets the Voice Channel
-  botData.voiceChannel = await client.channels.find(x => x.name === botData.botName + " Lounge");
+  //botData.voiceChannel = await client.channels.find(x => x.name === botData.botName + " Lounge");
+
+  //joinVoice.execute(botData.voiceChannel); // Joines that Voice Channel
+
+  // Gets the controller Text Channel
+  await serverCheck.serverCheck(botData)
+
+
 
   joinVoice.execute(botData.voiceChannel); // Joines that Voice Channel
 
-  // Gets the controller Text Channel
-  var controller = client.channels.find(x => x.name === "sparky-controller");
-  botData.textChannel = controller; // Stores the Text Channel
-
-  await deleteMessages.execute(controller); // Deletes all messages in the controller
+  await deleteMessages.execute(botData.textChannel); // Deletes all messages in the controller
 
   // Adds all the DJ's messages to the controller
-  const play = await createPlayingMessage.execute(botData);
-  const queue = await createQueueMessage.execute(botData);
-  const command = await createCommandMessage.execute(botData)
-  const reply = await createReplyMessage.execute(botData)
-
-  // Stores the ID's of the DJ's messages
-  botData.playing = play;
-  botData.queue = queue;
-  botData.command = command;
-  botData.reply = reply;
+  botData.playing = await createPlayingMessage.execute(botData);
+  botData.queue = await createQueueMessage.execute(botData);
+  botData.command = await createCommandMessage.execute(botData)
+  botData.reply = await createReplyMessage.execute(botData)
 
   console.log("Ready!");
 
@@ -113,12 +121,33 @@ client.once("ready", async () => {
 client.once("reconnecting", () => {
   console.log("Reconnecting!");
   const joinVoice = require('./util/joinVoice.js')
-  joinVoice.execute(client);
+  joinVoice.execute(botData.voiceChannel);
 });
 
 client.once("disconnect", () => {
   console.log("Disconnect!");
 });
+
+client.on('messageReactionAdd', async (reaction, user) => {
+  //console.log(user)
+  if (user.bot) return;
+  const updateMessage = require('./util/updateMessage.js')
+  const queueToString = require('./util/queueToString.js')
+  if (reaction.emoji.name === "next") {
+    botData.offset += 10
+  }
+  if (reaction.emoji.name === "back") {
+    botData.offset -= 10
+  }
+  if (reaction.emoji.name === "forward") {
+    botData.offset = botData.songs.length-10
+  }
+  if (reaction.emoji.name === "backward") {
+    botData.offset = 1
+  }
+  botData.currentQueue = await queueToString.execute(botData, botData.offset)
+  updateMessage.execute(botData)
+})
 
 client.on("message", async message => {
   const joinVoice = await require('./util/joinVoice.js')
@@ -140,15 +169,29 @@ client.on("message", async message => {
     }
   }
   if (message.content.startsWith(`${prefix}play`) || message.content.startsWith(`${prefix}Play`)) {
-    client.commands.get('execute').execute(client, message, botData);
-    return message.delete();
+    const args = message.content.substring(6);
+    if (args.startsWith("https://") && args.match(/playlist/g) != null && !args.match(/youtube/g) != null) {
+      const getPlaylistSongs = require('./util/getPlaylistSongs.js')
+      await getPlaylistSongs.execute(botData, args, message.author, "YT_PLAYLIST")
+
+      client.commands.get('executePlaylist').execute(client, message, botData, "YT_URL");
+
+      return message.delete()
+    }
+    else {
+      client.commands.get('execute').execute(client, message, botData);
+      return message.delete();
+    }
   } else if (message.content.startsWith(`${prefix}skip`) || message.content.startsWith(`${prefix}Skip`)) {
     client.commands.get('skip').execute(message, botData);
     return message.delete();
   } else if (message.content.startsWith(`${prefix}stop`) || message.content.startsWith(`${prefix}Stop`)) {
     client.commands.get('stop').execute(message, botData);
     return message.delete();
-  } else {
+  } else if (message.content.startsWith(`${prefix}shuffle`) || message.content.startsWith(`${prefix}Shuffle`)) {
+    client.commands.get('shuffle').execute(botData, message);
+    return message.delete();
+  }else {
     botData.currentReply = "[" + message.author + "] You need to enter a valid command!"
     message.delete();
     return updateMessage.execute(botData)

@@ -19,7 +19,7 @@ module.exports = {
       botData.connection.dispatcher.end();
     }
     else {
-      if (index >= botData.songs.length) {
+      if (index >= botData.songs.length || index < 1) {
         botData.currentReply = "[" + message.author + "] You cannot skip to a song that is not in the playlist"
         return updateMessage.execute(botData)
       }

@@ -5,6 +5,11 @@ module.exports = {
 	async execute(totalSeconds) {
     var time
     //console.log(typeof totalSeconds)
+
+		if (totalSeconds == null) {
+			return "[?]"
+		}
+
     if (totalSeconds.match(/:/g)) {
       return totalSeconds;
     }

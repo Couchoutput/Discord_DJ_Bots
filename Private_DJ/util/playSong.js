@@ -27,10 +27,15 @@ module.exports = {
 
           botData.currentSong = "No Songs to Play";
           botData.currentQueue = "No Songs in Queue"
+					botData.offset = 1
           updateMessage.execute(botData)
           //queueMessage(botData.textChannel, botData.queue, "No Songs in Queue")
         }
         else {
+					if (botData.songs.length < botData.offset) {
+						botData.offset -= 10;
+					}
+					console.log(botData.songs[0])
           module.exports.execute(message, botData.songs[0], botData.requesters[0], botData);
         }
     }).on("error", error => console.error(error));

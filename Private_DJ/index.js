@@ -140,12 +140,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
     botData.offset -= 10
   }
   if (reaction.emoji.name === "forward") {
-    botData.offset = botData.songs.length-10
+    botData.offset = botData.songs.length - ((botData.songs.length-1) % 10)
+    console.log(botData.songs.length - ((botData.songs.length-1) % 10))
   }
   if (reaction.emoji.name === "backward") {
     botData.offset = 1
   }
-  botData.currentQueue = await queueToString.execute(botData, botData.offset)
+  botData.currentQueue = await queueToString.execute(botData)
   updateMessage.execute(botData)
 })
 

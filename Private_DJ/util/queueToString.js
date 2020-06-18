@@ -2,7 +2,7 @@ module.exports = {
 	name: 'queueToString',
 	description: 'Plays the music or adds it to the Queue.',
 
-	async execute(botData, start = 1) {
+	async execute(botData) {
 	const timeToString = require('./timeToString.js')
   var str = "";
   var time = ""
@@ -11,19 +11,19 @@ module.exports = {
     return "No Songs in Queue"
   }
 	var clearence = 0
-	if (start > 1)
-		clearence = botData.songs.length - start
+	if (botData.offset > 1)
+		clearence = botData.songs.length - botData.offset
 
-	if (botData.songs.length > start + 10) {
-	  for (i = start; i < start + 10; i++) {
+	if (botData.songs.length > botData.offset + 10) {
+	  for (i = botData.offset; i < (botData.offset + 10); i++) {
 	    //var time = new Date(botData.songs[i].duration * 1000).toISOString().substr(11, 8)
-	    //console.log(time)
+	    console.log(i)
 	    time = await timeToString.execute(botData.songs[i].duration)
 
 	    str += `${i}) ` + "[" + botData.songs[i].title +"](" + botData.songs[i].url + ") [" + botData.requesters[i] + "] " + time + "\n"
 		}
-	} else if (botData.songs.length < start + 10 && botData.songs.length > start && botData.songs.length > 10){
-		for (i = start; i < (botData.songs.length - start); i++) {
+	} else if (botData.songs.length < (botData.offset + 10) && botData.songs.length > botData.offset && botData.songs.length > 10){
+		for (i = botData.offset; i < (botData.songs.length); i++) {
 	    //var time = new Date(botData.songs[i].duration * 1000).toISOString().substr(11, 8)
 	    //console.log(time)
 	    time = await timeToString.execute(botData.songs[i].duration)
@@ -31,7 +31,7 @@ module.exports = {
 	    str += `${i}) ` + "[" + botData.songs[i].title +"](" + botData.songs[i].url + ") [" + botData.requesters[i] + "] " + time + "\n"
 		}
 	} else {
-		for (i = start; i < botData.songs.length; i++) {
+		for (i = botData.offset; i < botData.songs.length; i++) {
 	    //var time = new Date(botData.songs[i].duration * 1000).toISOString().substr(11, 8)
 	    //console.log(time)
 	    time = await timeToString.execute(botData.songs[i].duration)
@@ -41,25 +41,27 @@ module.exports = {
 	}
 
 	if (botData.songs.length > 10) {
-		if (start > 1 && start < botData.songs.length - 10) {
+		var pages = Math.floor(botData.songs.length / 10);
+
+		if (botData.offset > 1 && botData.offset < botData.songs.length - 10) {
 			//:arrow_left
 			const next = botData.client.emojis.find(emoji => emoji.name === 'next');
 			const back = botData.client.emojis.find(emoji => emoji.name === 'back');
 			const forward = botData.client.emojis.find(emoji => emoji.name === 'forward');
 			const backward = botData.client.emojis.find(emoji => emoji.name === 'backward');
-			str += `\n${backward}  | ${back} ${start-1} Songs | ${botData.songs.length - start} Songs ${next} |  ${forward}`
+			str += `\n${backward}  | ${back} ${botData.offset-1} Songs | ${botData.songs.length - botData.offset} Songs ${next} |  ${forward}`
 			botData.react = 3
-		} else if (start == 1) {
+		} else if (botData.offset == 1) {
 			const next = botData.client.emojis.find(emoji => emoji.name === 'next');
 			const forward = botData.client.emojis.find(emoji => emoji.name === 'forward');
 			//console.log(botData.client.emojis)
-			str += `\n${botData.songs.length - start} Songs ${next} |  ${forward}`
+			str += `\n${botData.songs.length - (botData.offset + 10)} Songs ${next} |  ${forward}`
 			botData.react = 2
 		} else {
 			const back = botData.client.emojis.find(emoji => emoji.name === 'back');
 			const backward = botData.client.emojis.find(emoji => emoji.name === 'backward');
 			//console.log(botData.client.emojis)
-			str += `\n${backward}  | ${back} ${start - 1} Songs`
+			str += `\n${backward}  | ${back} ${botData.offset - 1} Songs`
 			botData.react = 1
 		}
 

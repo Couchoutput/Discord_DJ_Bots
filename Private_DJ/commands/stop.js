@@ -11,6 +11,7 @@ module.exports = {
     if (botData.songs.length > 0) {
       botData.songs = [];
 			botData.currentReply = "";
+			botData.repeat = 0;
       botData.connection.dispatcher.end();
     }
     else {

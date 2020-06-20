@@ -5,7 +5,7 @@ const ytsr = require("ytsr")
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var Spotify = require('spotify-web-api-js');
 
-const {prefix, token,} = require('./config.json')
+const {prefix, token, color,} = require('./config.json')
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -26,6 +26,7 @@ async function getFiles(folder) {
 // Object that stores information about the DJ
 const botData = {
   prefix: prefix,
+  color: parseInt(color),
   admins: new Discord.Collection(),
   couchoutputs: new Discord.Collection(),
   moderators: new Discord.Collection(),
@@ -49,7 +50,9 @@ const botData = {
   react: 0,
   page: 1,
   pages: null,
-  offset: 1
+  offset: 1,
+  repeat: 0,
+  repeatIcon: null
 };
 
 const serverCheck = require('./util/serverCheck.js')
@@ -63,6 +66,9 @@ client.once("ready", async () => {
   botData.botName = client.user.username
   console.log(`Logged in as ${client.user.tag}!`)
   botData.guild = client.guilds.find(x => x.name === 'Couchoutput Studios')
+
+  botData.repeatIcon = botData.client.emojis.find(emoji => emoji.name === 'repeat');
+  //botData.repeatIcon = "[repeat]"
 
   var admins = botData.guild.roles.find(x => x.name === "Admins").members
 
@@ -250,9 +256,12 @@ client.on("message", async message => {
     client.commands.get('stop').execute(message, botData);
     return message.delete();
   } else if (message.content.startsWith(`${prefix}shuffle`) || message.content.startsWith(`${prefix}Shuffle`)) {
-    client.commands.get('shuffle').execute(botData, message);
+    client.commands.get('shuffle').execute(message, botData);
     return message.delete();
-  }else {
+  } else if (message.content.startsWith(`${prefix}repeat`) || message.content.startsWith(`${prefix}Repeat`)) {
+    client.commands.get('repeat').execute(message, botData);
+    return message.delete();
+  } else {
     botData.currentReply = "[" + message.author + "] You need to enter a valid command!"
     message.delete();
     return updateMessage.execute(botData)

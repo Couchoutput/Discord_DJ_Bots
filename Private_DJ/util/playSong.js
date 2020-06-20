@@ -19,8 +19,16 @@ module.exports = {
 
     //dispatcher.setVolumeDecibels(60)
     dispatcher.playStream(ytdl(song.url, {quality: 'highestaudio'}), { filter : 'audioonly'}).on("end", () => {
-        botData.songs.shift();
-        botData.requesters.shift();
+
+				// If on repeat, take current song and push to end
+				if (botData.repeat == 1) {
+					botData.songs.push(botData.songs.shift())
+					botData.requesters.push(botData.requesters.shift())
+				}
+				else {
+					botData.songs.shift();
+	        botData.requesters.shift();
+				}
 
         if (botData.songs.length == 0) {
 					botData.client.user.setActivity('')

@@ -3,7 +3,7 @@ module.exports = {
 	description: 'Creates the DJ\'s Playing Message',
   async execute(botData) {
   var msg = await botData.textChannel.send({embed: {
-    color: 0xe9e949,
+    color: botData.color,
     title: `${botData.botName} is Now Playing`,
     description: "No Songs to Play"
    }

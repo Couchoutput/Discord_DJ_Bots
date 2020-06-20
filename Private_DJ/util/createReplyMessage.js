@@ -4,7 +4,7 @@ module.exports = {
 
 	async execute(botData) {
     var msg = await botData.textChannel.send({embed: {
-      color: 0xe9e949,
+      color: botData.color,
       title: `${botData.botName}'s Replies`,
       description: " "
       }

@@ -45,7 +45,7 @@ module.exports = {
 		}
 	}
 
-	if (botData.songs.length > 10) {
+	if (botData.songs.length > 11) {
 		if ((botData.songs.length-1) % 10 == 0) {
 			botData.pages = Math.floor((botData.songs.length-1) / 10);
 		}

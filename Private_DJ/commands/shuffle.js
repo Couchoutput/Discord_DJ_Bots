@@ -2,7 +2,7 @@ module.exports = {
 	name: 'shuffle',
 	description: 'Plays the music or adds it to the Queue.',
 
-	async execute(botData, message) {
+	async execute(message, botData) {
 		const updateMessage = require('../util/updateMessage.js')
 		const queueToString = require('../util/queueToString.js')
 

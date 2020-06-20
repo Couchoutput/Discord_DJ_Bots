@@ -4,7 +4,7 @@ module.exports = {
 
 	async execute(msg, botData) {
     await msg.edit({embed: {
-      color: 0xe9e949,
+      color: botData.color,
       title: `${botData.botName}'s Replies`,
       description: botData.currentReply
      }
